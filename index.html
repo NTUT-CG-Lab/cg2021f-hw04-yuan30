@@ -40,7 +40,7 @@
 			so.addChild("回答問題", 2, true);
 			so.addChild("當GUI的數值改變時，須將數值記錄起來", 2, true);
 			so.addChild("可使用按鍵P顯示目前紀錄的值", 1, true);
-			so.addChild("紀錄的數值儲存為JSON檔", 2, false);
+			so.addChild("紀錄的數值儲存為JSON檔", 2, true);
 			so.addChild("可按鍵選擇上 / 下一隻角色，角色morph也要改變", 1, true);
 				
 			//產生自評表，參數如下所示
@@ -143,7 +143,7 @@
 
 				effect = new OutlineEffect( renderer );
 
-				// load model and build gui menu
+				// 載入模型和建置GUI(load model and build gui menu)
 				loadModelAndBuildGui();
 
 				// 鏡頭控制
@@ -161,8 +161,8 @@
 			}
 
 			function loadModelAndBuildGui() {
-				// model
-
+				
+				// 載入模型，用的數字進度條
 				function onProgress( xhr ) {
 
 					if ( xhr.lengthComputable ) {
@@ -175,6 +175,7 @@
 				}
 
 				let modelFile = 'models/mmd/KizunaAI_ver1.01/KizunaAI_ver1.01/kizunaai.pmx';
+				// 若物件未初始化(undefined)同等 null。if判斷式中 if(object != null) 等於 if(object)
 				if( modelFiles[modelSelected] != null )
 					modelFile = modelFiles[modelSelected];
 
@@ -216,11 +217,11 @@
 
 							vpdIndex ++;
 
-							if ( vpdIndex < vpdFiles.length ) {
+							if ( vpdIndex < vpdFiles.length ) { // 先初始化 pose 用到的 vpd
 
 								loadVpd();
 
-							} else {
+							} else { // 之後再初始化 GUI
 
 								initGui();
 
@@ -428,7 +429,81 @@
 					return false;
 
 				}
+
+				// 按 S 儲存目前的數值
+				if ( keyCode === 83 ) {
+
+					saveFile();
+
+				}
 			}
+
+			function saveFile() {
+				const myData = {
+					"0":stdlocal[ 0 ],
+					"1":stdlocal[ 1 ],
+					"2":stdlocal[ 2 ],
+					"3":stdlocal[ 3 ],
+					"4":stdlocal[ 4 ],
+					"5":stdlocal[ 5 ],
+					"6":stdlocal[ 6 ],
+					"7":stdlocal[ 7 ],
+					"8":stdlocal[ 8 ],
+					"9":stdlocal[ 9 ],
+					"10":stdlocal[ 10 ],
+					"11":stdlocal[ 11 ],
+					"12":stdlocal[ 12 ],
+					"13":stdlocal[ 13 ],
+					"14":stdlocal[ 14 ],
+					"15":stdlocal[ 15 ],
+					"16":stdlocal[ 16 ],
+					"17":stdlocal[ 17 ],
+					"18":stdlocal[ 18 ],
+					"19":stdlocal[ 19 ],
+					"20":stdlocal[ 20 ],
+					"21":stdlocal[ 21 ],
+					"22":stdlocal[ 22 ],
+					"23":stdlocal[ 23 ],
+					"24":stdlocal[ 24 ],
+					"25":stdlocal[ 25 ],
+					"26":stdlocal[ 26 ],
+					"27":stdlocal[ 27 ],
+					"28":stdlocal[ 28 ],
+					"29":stdlocal[ 29 ],
+					"30":stdlocal[ 30 ],
+					"31":stdlocal[ 31 ],
+					"32":stdlocal[ 32 ],
+					"33":stdlocal[ 33 ],
+					"34":stdlocal[ 34 ],
+					"35":stdlocal[ 35 ],
+					"36":stdlocal[ 36 ]
+				};
+				const myJson = JSON.stringify(myData);
+				//放入 fileData(json資料), fileName, type
+				download(myJson, 'save_morph_number.json', 'application/json');
+				
+				return false;
+			}
+
+			function download(data, filename, type) {
+				var file = new Blob([data], {type: type});
+				if (window.navigator.msSaveOrOpenBlob) // IE10+
+					window.navigator.msSaveOrOpenBlob(file, filename);
+				else { // Others
+					var a = document.createElement("a"),
+							url = URL.createObjectURL(file);
+					a.href = url;
+					a.download = filename;
+					console.log(url);
+					document.body.appendChild(a);
+					a.click();
+					setTimeout(function() {
+						document.body.removeChild(a);
+						window.URL.revokeObjectURL(url);  
+					}, 0); 
+				}
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
